@@ -1,5 +1,6 @@
 //jshint esversion:6
 
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
@@ -32,9 +33,8 @@ const userSchema = new mongoose.Schema({
   password: String
 });
 
-const secret = "Thisisourlittlesecret";
 userSchema.plugin(encrypt, {
-  secret: secret,
+  secret: process.env.SECRET,
   encryptedFields: ["password"]
 });
 
@@ -61,6 +61,7 @@ app.route("/login")
           }
         }
       } else {
+        res.send("<h1>User not found!</h1>");
         console.log(err);
       }
     });
