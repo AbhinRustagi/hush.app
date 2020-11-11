@@ -5,10 +5,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-// const md5 = require('md5');
-// const bcrypt = require("bcrypt");
 const app = express();
-// const saltRounds = 10;
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
 const session = require('express-session');
@@ -37,7 +34,7 @@ mongoose.connect("mongodb://localhost:27017/userdb", {
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
+db.once('open', function () {
   console.log("Connection established to the database.");
 });
 
@@ -46,7 +43,7 @@ const userSchema = new mongoose.Schema({
   password: String
 });
 
-mongoose.set('useCreateIndex',true);
+mongoose.set('useCreateIndex', true);
 
 userSchema.plugin(passportLocalMongoose);
 
@@ -58,25 +55,25 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.route("/")
-  .get(function(req, res){
+  .get(function (req, res) {
     res.render("home");
   });
 
 app.route("/login")
-  .get(function(req, res){
+  .get(function (req, res) {
     res.render("login");
   })
-  .post(function(req, res){
+  .post(function (req, res) {
     const user = new User({
       username: req.body.username,
       password: req.body.password
     });
 
-    req.login(user, function(err){
-      if(err){
+    req.login(user, function (err) {
+      if (err) {
         console.log(err);
       } else {
-        passport.authenticate("local")(req, res, function(){
+        passport.authenticate("local")(req, res, function () {
           res.redirect("/secrets");
         });
       }
@@ -84,8 +81,8 @@ app.route("/login")
   });
 
 app.route("/secrets")
-  .get(function(req, res){
-    if(req.isAuthenticated()) {
+  .get(function (req, res) {
+    if (req.isAuthenticated()) {
       res.render("secrets");
     } else {
       res.redirect("/login");
@@ -93,16 +90,18 @@ app.route("/secrets")
   });
 
 app.route("/register")
-  .get(function(req, res){
+  .get(function (req, res) {
     res.render("register");
   })
-  .post(function(req, res){
-    User.register({username: req.body.username}, req.body.password, function(err, user){
-      if(err){
+  .post(function (req, res) {
+    User.register({
+      username: req.body.username
+    }, req.body.password, function (err, user) {
+      if (err) {
         console.log(err);
         res.redirect("/register");
       } else {
-        passport.authenticate("local")(req, res, function(){
+        passport.authenticate("local")(req, res, function () {
           res.redirect("/secrets");
         });
       }
@@ -110,11 +109,11 @@ app.route("/register")
   });
 
 app.route("/logout")
-  .get(function(req, res){
+  .get(function (req, res) {
     req.logout();
     res.redirect("/");
   });
 
-app.listen(8888, function(){
+app.listen(8888, function () {
   console.log("Server started on Port 8888.");
 });
